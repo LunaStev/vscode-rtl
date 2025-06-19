@@ -26,12 +26,14 @@ import { Position } from '../../../../../common/core/position.js';
 import { DetailedLineRangeMapping } from '../../../../../common/diff/rangeMapping.js';
 import { ScrollType } from '../../../../../common/editorCommon.js';
 import { BackgroundTokenizationState } from '../../../../../common/tokenizationTextModelPart.js';
-import { InlineDecoration, InlineDecorationType } from '../../../../../common/viewModel.js';
+import { InlineDecoration } from '../../../../../common/viewModel.js';
 import { IClipboardService } from '../../../../../../platform/clipboard/common/clipboardService.js';
 import { IContextMenuService } from '../../../../../../platform/contextview/browser/contextView.js';
 import { DiffEditorOptions } from '../../diffEditorOptions.js';
 import { Range } from '../../../../../common/core/range.js';
 import { ILineBreaksComputerContext, ModelLineProjectionData } from '../../../../../common/modelLineProjectionData.js';
+import { LineInlineDecoration } from '../../../../../common/textModelEvents.js';
+import { InlineDecorationType } from '../../../../../common/model.js';
 
 /**
  * Ensures both editors have the same height by aligning unchanged lines.
@@ -178,7 +180,7 @@ export class DiffEditorViewZones extends Disposable {
 						getLineTokens: (lineNumber: number) => {
 							return originalModel.getLineTokens(lineNumber, originalEditor.getNumberId());
 						},
-						getLineInlineDecorations: (lineNumber: number) => {
+						getLineInlineDecorations: (lineNumber: number): LineInlineDecoration[] => {
 							return originalModel.getLineInlineDecorations(lineNumber, originalEditor.getNumberId());
 						},
 						getLineInjectedText: (lineNumber: number) => {

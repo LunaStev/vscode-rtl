@@ -19,14 +19,13 @@ import { IWordAtPosition } from './core/wordHelper.js';
 import { FormattingOptions } from './languages.js';
 import { ILanguageSelection } from './languages/language.js';
 import { IBracketPairsTextModelPart } from './textModelBracketPairs.js';
-import { IModelContentChange, IModelContentChangedEvent, IModelDecorationsChangedEvent, IModelLanguageChangedEvent, IModelLanguageConfigurationChangedEvent, IModelOptionsChangedEvent, IModelTokensChangedEvent, InternalModelContentChangeEvent, LineInjectedText, ModelFontChangedEvent, ModelInjectedTextChangedEvent, ModelLineHeightChangedEvent } from './textModelEvents.js';
+import { IModelContentChange, IModelContentChangedEvent, IModelDecorationsChangedEvent, IModelLanguageChangedEvent, IModelLanguageConfigurationChangedEvent, IModelOptionsChangedEvent, IModelTokensChangedEvent, InternalModelContentChangeEvent, LineInjectedText, LineInlineDecoration as LineInlineDecoration, ModelFontChangedEvent, ModelInjectedTextChangedEvent, ModelLineHeightChangedEvent } from './textModelEvents.js';
 import { IGuidesTextModelPart } from './textModelGuides.js';
 import { ITokenizationTextModelPart } from './tokenizationTextModelPart.js';
 import { UndoRedoGroup } from '../../platform/undoRedo/common/undoRedo.js';
 import { LineTokens, TokenArray } from './tokens/lineTokens.js';
 import { IEditorModel } from './editorCommon.js';
 import { TextModelEditReason } from './textModelEditReason.js';
-import { InlineDecorations } from './viewModel/viewModelDecorations.js';
 
 /**
  * Vertical Lane in the overview ruler of the editor.
@@ -386,6 +385,56 @@ export interface IModelDecoration {
 	 */
 	readonly options: IModelDecorationOptions;
 }
+
+/**
+ * Type of the model inline decoration.
+ * @internal
+ */
+export const enum InlineDecorationType {
+	Regular = 0,
+	Before = 1,
+	After = 2,
+	RegularAffectingLetterSpacing = 3
+}
+
+/**
+ * An inline decoration in the model.
+ * @internal
+ */
+export interface IModelInlineDecoration {
+	/**
+	 * Range that this decoration covers.
+	 */
+	readonly range: IRange;
+	/**
+	 * The inline class name that will be applied to the text in the range.
+	 */
+	readonly inlineClassName: string;
+	/**
+	 * The type of the decoration.
+	 */
+	readonly type: InlineDecorationType;
+	/**
+	 * Whether it affects the font
+	 */
+	readonly affectsFont: boolean;
+}
+
+/**
+ * Decoration viewport data.
+ * @internal
+ */
+export interface IModelDecorationViewportData {
+	/**
+	 * Model decorations that are in the viewport.
+	 */
+	modelDecoration: IModelDecoration;
+	/**
+	 * Model inline decorations that are in the viewport per line.
+	 */
+	modelInlineDecorations: IModelInlineDecoration[];
+}
+
 
 /**
  * An accessor that can add, change or remove model decorations.
@@ -844,7 +893,7 @@ export interface ITextModel {
 	 * Get the inline decorations for a certain line.
 	 * @internal
 	 */
-	getLineInlineDecorations(lineNumber: number, ownerId?: number): InlineDecorations;
+	getLineInlineDecorations(lineNumber: number, ownerId?: number): LineInlineDecoration[];
 
 	/**
 	 * Get the text length for a certain line.
@@ -1134,6 +1183,19 @@ export interface ITextModel {
 	 * @return An array with the decorations
 	 */
 	getDecorationsInRange(range: IRange, ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean, onlyMinimapDecorations?: boolean, onlyMarginDecorations?: boolean): IModelDecoration[];
+
+	/**
+	 * Get viewport decorations in a range as an object containing the model decorations and the model inline decorations. Only `startLineNumber` and `endLineNumber` from `range` are used for filtering.
+	 * So for now it returns all the decorations on the same line as `range`.
+	 * @param range The range to search in
+	 * @param ownerId If set, it will ignore decorations belonging to other owners.
+	 * @param filterOutValidation If set, it will ignore decorations specific to validation (i.e. warnings, errors).
+	 * @param onlyMinimapDecorations If set, it will return only decorations that render in the minimap.
+	 * @param onlyMarginDecorations If set, it will return only decorations that render in the glyph margin.
+	 * @return An object containing the model decorations and the model inline decorations.
+	 * @internal
+	 */
+	getViewportDecorationsInRange(range: IRange, ownerId?: number, filterOutValidation?: boolean, filterFontDecorations?: boolean, onlyMinimapDecoration?: boolean, onlyMarginDecorations?: boolean): IModelDecorationViewportData[];
 
 	/**
 	 * Gets all the decorations as an array.

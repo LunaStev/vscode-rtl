@@ -11,7 +11,6 @@ import { MonospaceLineBreaksComputerFactory } from '../../../common/viewModel/mo
 import { TestConfiguration } from '../../browser/config/testConfiguration.js';
 import { LineTokens } from '../../../common/tokens/lineTokens.js';
 import { LanguageIdCodec } from '../../../common/services/languagesRegistry.js';
-import { InlineDecorations } from '../../../common/viewModel/viewModelDecorations.js';
 
 function parseAnnotatedText(annotatedText: string): { text: string; indices: number[] } {
 	let text = '';
@@ -95,7 +94,7 @@ function getLineBreakData(factory: ILineBreaksComputerFactory, tabSize: number, 
 			return text;
 		},
 		getLineInlineDecorations(lineNumber: number) {
-			return new InlineDecorations();
+			return [];
 		},
 		getLineTokens(lineNumber: number) {
 			return new LineTokens(new Uint32Array(text.length), text, new LanguageIdCodec());

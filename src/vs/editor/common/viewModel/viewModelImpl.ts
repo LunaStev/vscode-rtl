@@ -41,8 +41,8 @@ import { IViewModelLines, ViewModelLinesFromModelAsIs, ViewModelLinesFromProject
 import { IThemeService } from '../../../platform/theme/common/themeService.js';
 import { GlyphMarginLanesModel } from './glyphLanesModel.js';
 import { ICustomLineHeightData } from '../viewLayout/lineHeights.js';
-import { LineInjectedText } from '../textModelEvents.js';
-import { IViewLineTokens } from '../tokens/lineTokens.js';
+import { LineInjectedText, LineInlineDecoration } from '../textModelEvents.js';
+import { LineTokens } from '../tokens/lineTokens.js';
 
 const USE_IDENTITY_LINES_COLLECTION = true;
 
@@ -819,10 +819,10 @@ export class ViewModel extends Disposable implements IViewModel {
 			getLineContent: (lineNumber: number): string => {
 				return this.model.getLineContent(lineNumber);
 			},
-			getLineTokens: (lineNumber: number): IViewLineTokens => {
+			getLineTokens: (lineNumber: number): LineTokens => {
 				return this.model.getLineTokens(lineNumber, this._editorId);
 			},
-			getLineInlineDecorations: (lineNumber: number): InlineDecorations => {
+			getLineInlineDecorations: (lineNumber: number): LineInlineDecoration[] => {
 				return this.model.getLineInlineDecorations(lineNumber, this._editorId);
 			},
 			getLineInjectedText: (lineNumber: number): LineInjectedText[] => {
